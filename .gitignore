@@ -6,5 +6,7 @@
 Assets/*
 !Assets/Scripts
 !Assets/Editor
+!Assets/Tilemap
 !Assets/Scripts.meta
 !Assets/Editor.meta
+!Assets/Tilemap.meta

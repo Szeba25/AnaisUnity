@@ -19,6 +19,9 @@ namespace Anais {
         private int maxCost;
         private int iterations;
 
+        /// <summary>
+        /// Create a new node graph search. The search is NOT ready when constructed. (Call SetMapData and Initialize).
+        /// </summary>
         public NodeGraphSearch() {
             searchID = 0;
 
@@ -34,6 +37,9 @@ namespace Anais {
             iterations = 0;
         }
 
+        /// <summary>
+        /// Called to process as much iterations as possible, and timing the operation.
+        /// </summary>
         public void TimedCalculate() {
             Stopwatch stopwatch = Stopwatch.StartNew();
             Calculate();
@@ -42,10 +48,17 @@ namespace Anais {
                 iterations + " iterations");
         }
 
+        /// <summary>
+        /// Called to process as much iterations as possible.
+        /// </summary>
         public void Calculate() {
             Calculate(maxIterations);
         }
 
+        /// <summary>
+        /// Called to process pathfinding calculation. You can specify a max iteration count here.
+        /// </summary>
+        /// <param name="maxCycleIterations"></param>
         public void Calculate(int maxCycleIterations) {
             if (initialized) {
                 int cycleIterations = 0;
@@ -71,6 +84,10 @@ namespace Anais {
             }
         }
 
+        /// <summary>
+        /// Sets the map data on which the pathfinder will operate.
+        /// </summary>
+        /// <param name="mapData"></param>
         public void SetMapData(MapData mapData) {
             if (!initialized) { 
                 this.mapData = mapData;
@@ -79,6 +96,10 @@ namespace Anais {
             }
         }
 
+        /// <summary>
+        /// Sets a new maximum iteration count. After this iteration count the pathfinder will stop.
+        /// </summary>
+        /// <param name="maxIterations"></param>
         public void SetMaxIterations(int maxIterations) {
             if (!initialized) {
                 this.maxIterations = maxIterations;
@@ -87,6 +108,10 @@ namespace Anais {
             }
         }
 
+        /// <summary>
+        /// Sets a new maximum cost. Nodes which cost more than this value are ignored in the next search.
+        /// </summary>
+        /// <param name="maxCost"></param>
         public void SetMaxCost(int maxCost) {
             if (!initialized) {
                 this.maxCost = maxCost;
@@ -95,6 +120,11 @@ namespace Anais {
             }
         }
 
+        /// <summary>
+        /// Initialize the pathfinder before starting the search.
+        /// </summary>
+        /// <param name="searchAgent"></param>
+        /// <param name="allAgents"></param>
         public void Initialize(IUnitObject searchAgent, List<IUnitObject> allAgents) {
             searchID++;
 
@@ -116,6 +146,11 @@ namespace Anais {
             current = null;
         }
 
+        /// <summary>
+        /// Add all search agents prior searching to the closed list.
+        /// </summary>
+        /// <param name="subject"></param>
+        /// <param name="allAgents"></param>
         private void AddSearchAgentsToClosed(IUnitObject subject, List<IUnitObject> allAgents) {
             for (int i = 0; i < allAgents.Count; i++) {
                 IUnitObject obj = allAgents[i];
@@ -128,11 +163,17 @@ namespace Anais {
             }
         }
 
+        /// <summary>
+        /// Stop the pathfinding process.
+        /// </summary>
         private void Stop() {
             initialized = false;
             finished = true;
         }
 
+        /// <summary>
+        /// Add sorrounding nodes to the heap (open list).
+        /// </summary>
         private void AddNodesToHeap() {
             int x = current.X;
             int y = current.Y;
@@ -153,6 +194,13 @@ namespace Anais {
             if (!right && !up) AddNode(x + 1, y + 1, current, 14);
         }
 
+        /// <summary>
+        /// Add a new node to the open list.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="parent"></param>
+        /// <param name="extraCost"></param>
         private void AddNode(int x, int y, Node parent, int extraCost) {
             if (!mapData.GetCollision(x, y) && !IgnoreThis(x, y)) {
                 int newTotalCost = parent.TotalCost + extraCost;
@@ -165,6 +213,12 @@ namespace Anais {
             }
         }
 
+        /// <summary>
+        /// Check for the specified coordinate, if the pathfinder should ignore this.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns>True if the pathfinder should ignore the coordinate</returns>
         private bool IgnoreThis(int x, int y) {
             Node node = mapData.GetNode(x, y);
             if (node.ClosedListId == searchID) {
@@ -185,10 +239,12 @@ namespace Anais {
             }
         }
 
-        /*
-         * Untility functions for accessing and displaying the path
-         */
-
+        /// <summary>
+        /// Adds a path from a coordinate to the object.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public void AddPathFrom(IUnitObject obj, int x, int y) {
             if (finished) {
                 Node node = mapData.GetNode(x, y);
@@ -198,10 +254,19 @@ namespace Anais {
             }
         }
 
+        /// <summary>
+        /// Get all nodes the pathfinder found, and store it in the passed list.
+        /// </summary>
+        /// <param name="list"></param>
         public void GetAllNodes(List<Node> list) {
             GetNodesWithMaxCost(list, int.MaxValue);
         }
 
+        /// <summary>
+        /// Get nodes with a maximum cost specified.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="maxCost"></param>
         public void GetNodesWithMaxCost(List<Node> list, int maxCost) {
             list.Clear();
             for (int x = 0; x < mapData.Width; x++) {

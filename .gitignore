@@ -1,0 +1,10 @@
+/*
+
+!.gitignore
+
+!Assets/
+Assets/*
+!Assets/Scripts
+!Assets/Editor
+!Assets/Scripts.meta
+!Assets/Editor.meta

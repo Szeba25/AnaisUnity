@@ -10,27 +10,24 @@ namespace Anais {
         private IUnitObject partyLeader;
         private SmoothCamera smoothCamera;
 
-        private List<Node> movementNodes;
+        private NodeCollection movementNodes;
         private Node retraceNode;
         private GridSelection nodeSelection;
-
-        private Route testRoute;
-        private List<GameObject> pathPoints;
+        private PathPointCollection pathPoints;
 
         public StateMachine<ExplorationUI, ExplorationUIStates> StateMachine { get; private set; }
 
         private bool locked;
         private bool moveActionFired;
 
-        public ExplorationUI(Party party, IUnitObject partyLeader, SmoothCamera smoothCamera, GameObject nodeSelectionObject, List<GameObject> pathPoints) {
+        public ExplorationUI(Party party, IUnitObject partyLeader, SmoothCamera smoothCamera, GridSelection nodeSelection, PathPointCollection pathPoints) {
             this.party = party;
             this.partyLeader = partyLeader;
             this.smoothCamera = smoothCamera;
 
             movementNodes = null;
             retraceNode = null;
-            nodeSelection = new GridSelection(nodeSelectionObject, new Vector2Int(0, 0));
-            testRoute = new Route();
+            this.nodeSelection = nodeSelection;
             this.pathPoints = pathPoints;
 
             Dictionary<ExplorationUIStates, IState<ExplorationUI>> states = new Dictionary<ExplorationUIStates, IState<ExplorationUI>>();
@@ -58,15 +55,12 @@ namespace Anais {
             }
         }
 
-        public void Prepare(List<Node> movementNodes) {
+        public void Prepare(NodeCollection movementNodes) {
             this.movementNodes = movementNodes;
 
             retraceNode = null;
             nodeSelection.Visible = false;
-            testRoute.Clear();
-            for (int i = 0; i < pathPoints.Count; i++) {
-                pathPoints[i].SetActive(false);
-            }
+            pathPoints.HideAll();
             moveActionFired = false;
 
             Unlock();
@@ -80,8 +74,6 @@ namespace Anais {
         private void Unlock() {
             locked = false;
         }
-
-        /* StateMachine state methods */
 
         public Node GetMovementNode(FytInput input) {
             Vector2Int tilePosition = MathUtils.TileVectorFromWorld(input.MouseWorldPosition());
@@ -111,11 +103,7 @@ namespace Anais {
         }
 
         public void RetracePath() {
-            testRoute.RetraceFromNode(retraceNode);
-            for (int i = 0; i < pathPoints.Count; i++) {
-                pathPoints[i].SetActive(false);
-            }
-            testRoute.ActivatePathPointsFrom(pathPoints, retraceNode);
+            pathPoints.ShowFrom(retraceNode);
         }
 
         public bool IsMoveActionFired() {

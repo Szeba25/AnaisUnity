@@ -2,7 +2,7 @@
 
 namespace Anais {
 
-    class GridSelection {
+    public class GridSelection {
 
         private GameObject graphicsObject;
 
@@ -25,7 +25,11 @@ namespace Anais {
             }
         }
 
-        public GridSelection(GameObject graphicsObject, Vector2Int position) {
+        public GridSelection(GameObject graphicsObject, GameObject categoryObject, Vector2Int position) {
+            // Set the category
+            graphicsObject.transform.parent = categoryObject.transform;
+
+            // Set the rest of the values
             this.graphicsObject = graphicsObject;
             Position = position;
             Visible = false;

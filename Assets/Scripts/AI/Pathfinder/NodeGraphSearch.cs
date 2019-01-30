@@ -125,7 +125,7 @@ namespace Anais {
         /// </summary>
         /// <param name="searchAgent"></param>
         /// <param name="allAgents"></param>
-        public void Initialize(IUnitObject searchAgent, List<IUnitObject> allAgents) {
+        public void Initialize(IUnitObject searchAgent, UnitObjectCollection allAgents) {
             searchID++;
 
             Vector2Int tilePosition = searchAgent.Unit.Body.TilePosition;
@@ -151,7 +151,7 @@ namespace Anais {
         /// </summary>
         /// <param name="subject"></param>
         /// <param name="allAgents"></param>
-        private void AddSearchAgentsToClosed(IUnitObject subject, List<IUnitObject> allAgents) {
+        private void AddSearchAgentsToClosed(IUnitObject subject, UnitObjectCollection allAgents) {
             for (int i = 0; i < allAgents.Count; i++) {
                 IUnitObject obj = allAgents[i];
                 if (!ReferenceEquals(subject, obj)) {
@@ -255,25 +255,25 @@ namespace Anais {
         }
 
         /// <summary>
-        /// Get all nodes the pathfinder found, and store it in the passed list.
+        /// Get all nodes the pathfinder found, and store it in the passed node collection.
         /// </summary>
-        /// <param name="list"></param>
-        public void GetAllNodes(List<Node> list) {
-            GetNodesWithMaxCost(list, int.MaxValue);
+        /// <param name="collection"></param>
+        public void GetAllNodes(NodeCollection collection) {
+            GetNodesWithMaxCost(collection, int.MaxValue);
         }
 
         /// <summary>
         /// Get nodes with a maximum cost specified.
         /// </summary>
-        /// <param name="list"></param>
+        /// <param name="collection"></param>
         /// <param name="maxCost"></param>
-        public void GetNodesWithMaxCost(List<Node> list, int maxCost) {
-            list.Clear();
+        public void GetNodesWithMaxCost(NodeCollection collection, int maxCost) {
+            collection.Clear();
             for (int x = 0; x < mapData.Width; x++) {
                 for (int y = 0; y < mapData.Height; y++) {
                     Node node = mapData.GetNodeDirect(x, y);
                     if (node.ClosedListId == searchID && node.TotalCost <= maxCost) {
-                        list.Add(node);
+                        collection.Add(node);
                     }
                 }
             }

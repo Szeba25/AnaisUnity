@@ -1,6 +1,5 @@
 ﻿using FytCore;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Anais {
@@ -14,17 +13,15 @@ namespace Anais {
         public GameObject pathPointPrefab;
 
         private GameObject uiCloneObjects;
-        private GameObject nodeSelectionObject;
-        private List<GameObject> pathPoints;
+        private GridSelection nodeSelection;
+        private PathPointCollection pathPoints;
 
         private GameCore gameCore;
-        private List<IUnitObject> units;
+        private GameComponents components;
         private SmoothCamera smoothCamera;
         private IUnitObject partyLeader;
 
-        private MapData collision;
-        private NodeGraphSearch pathfinder;
-        private List<Node> movementNodes;
+        private NodeCollection movementNodes;
 
         private ExplorationUI explorationUI;
 
@@ -32,32 +29,26 @@ namespace Anais {
 
         void Awake() {
             uiCloneObjects = Instantiate(uiCloneObjectsPrefab);
-            nodeSelectionObject = Instantiate(nodeSelectionPrefab);
-            nodeSelectionObject.SetActive(false);
-            nodeSelectionObject.transform.parent = uiCloneObjects.transform;
-            pathPoints = new List<GameObject>();
+
+            GameObject nodeSelectionObject = Instantiate(nodeSelectionPrefab);
+            nodeSelection = new GridSelection(nodeSelectionObject, uiCloneObjects, new Vector2Int(0, 0));
+
+            pathPoints = new PathPointCollection();
             for (int i = 0; i < MAX_PATH_LENGTH; i++) {
                 GameObject pathPoint = Instantiate(pathPointPrefab);
-                pathPoint.SetActive(false);
-                pathPoint.transform.parent = uiCloneObjects.transform;
-                pathPoints.Add(pathPoint);
+                pathPoints.Add(pathPoint, uiCloneObjects);
             }
         }
 
         void Start()  {
             gameCore = GameObject.Find("GameCore").GetComponent<GameCore>();
-            units = new List<IUnitObject>();
-            RefreshUnits();
+            components = GameObject.Find("GameComponents").GetComponent<GameComponents>();
             smoothCamera = GameObject.Find("MainCamera").GetComponent<SmoothCamera>();
             partyLeader = GameObject.Find("PartyLeader").GetComponent<PartyLeader>();
 
-            collision = new MapData();
-            pathfinder = new NodeGraphSearch();
-            pathfinder.SetMapData(collision);
-            pathfinder.SetMaxCost(350);
-            movementNodes = new List<Node>();
+            movementNodes = new NodeCollection();
 
-            explorationUI = new ExplorationUI(gameCore.Party, partyLeader, smoothCamera, nodeSelectionObject, pathPoints);
+            explorationUI = new ExplorationUI(gameCore.Party, partyLeader, smoothCamera, nodeSelection, pathPoints);
 
             Dictionary<ExplorationStates, IState<ExplorationScene>> states = new Dictionary<ExplorationStates, IState<ExplorationScene>>();
             states.Add(ExplorationStates.CALCULATE_PATH, new ExplorationCalculatePathState());
@@ -73,9 +64,7 @@ namespace Anais {
         }
 
         public void FytUpdate(FytInput input) {
-            for (int i = 0; i < units.Count; i++) {
-                units[i].Process(input);
-            }
+            components.Units.Process(input);
             StateMachine.Process(input);
             explorationUI.Process(input);
         }
@@ -83,15 +72,6 @@ namespace Anais {
         public void FytLateUpdate(FytInput input) {
             
         }
-
-        private void RefreshUnits() {
-            units.Clear();
-            foreach(IUnitObject obj in FindObjectsOfType<MonoBehaviour>().OfType<IUnitObject>()) {
-                units.Add(obj);
-            }
-        }
-
-        /* StateMachine state methods */
 
         public void PrepareUI() {
             explorationUI.Prepare(movementNodes);
@@ -106,9 +86,10 @@ namespace Anais {
         }
 
         public void CalculatePath() {
-            pathfinder.Initialize(partyLeader, units);
-            pathfinder.TimedCalculate();
-            pathfinder.GetAllNodes(movementNodes);
+            components.Pathfinder.SetMaxCost(220);
+            components.Pathfinder.Initialize(partyLeader, components.Units);
+            components.Pathfinder.TimedCalculate();
+            components.Pathfinder.GetAllNodes(movementNodes);
         }
 
     }

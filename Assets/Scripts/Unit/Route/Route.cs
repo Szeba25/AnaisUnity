@@ -39,21 +39,6 @@ namespace Anais {
             route.RemoveAt(route.Count - 1);
         }
 
-        public void ActivatePathPointsFrom(List<GameObject> pathPoints, Node node) {
-            int i = 0;
-            while (node != null) {
-                if (i < pathPoints.Count) {
-                    pathPoints[i].SetActive(true);
-                    pathPoints[i].transform.position = MathUtils.WorldVectorFromTileCentered(new Vector2Int(node.X, node.Y));
-                    node = node.Parent;
-                    i++;
-                } else {
-                    Debug.Log("Route: can't handle " + i + " path length for display!");
-                    node = null;
-                }
-            }
-        }
-
         private void AddPosition(int x, int y, int cost) {
             route.Add(new RouteNode(new Vector2Int(x, y), cost));
         }

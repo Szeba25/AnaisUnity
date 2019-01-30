@@ -24,7 +24,10 @@ namespace Anais {
         }
 
         public void ShowFrom(Node node) {
+            // First hide all path points
             HideAll();
+
+            // Then iterate them over to show path from this node
             int i = 0;
             while (node != null) {
                 if (i < pathPoints.Count) {

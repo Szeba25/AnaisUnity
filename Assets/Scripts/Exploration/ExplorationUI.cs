@@ -63,16 +63,8 @@ namespace Anais {
             pathPoints.HideAll();
             moveActionFired = false;
 
-            Unlock();
-            StateMachine.ChangeState(ExplorationUIStates.WAIT_FOR_INPUT);
-        }
-
-        private void Lock() {
-            locked = true;
-        }
-
-        private void Unlock() {
             locked = false;
+            StateMachine.ChangeState(ExplorationUIStates.WAIT_FOR_INPUT);
         }
 
         public Node GetMovementNode(FytInput input) {
@@ -99,7 +91,7 @@ namespace Anais {
         public void FireMoveAction() {
             partyLeader.Unit.Body.RetracePath(retraceNode);
             moveActionFired = true;
-            Lock();
+            locked = true;
         }
 
         public void RetracePath() {

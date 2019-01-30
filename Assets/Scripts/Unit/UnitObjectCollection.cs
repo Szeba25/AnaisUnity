@@ -14,12 +14,11 @@ namespace Anais {
             unitObjects = new List<IUnitObject>();
         }
 
-        public void Clear() {
+        public void Set(IEnumerable<IUnitObject> list) {
             unitObjects.Clear();
-        }
-
-        public void Add(IUnitObject obj) {
-            unitObjects.Add(obj);
+            foreach (IUnitObject obj in list) {
+                unitObjects.Add(obj);
+            }
         }
 
         public void Process(FytInput input) {

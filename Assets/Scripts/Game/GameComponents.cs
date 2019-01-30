@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Anais {
@@ -18,10 +19,7 @@ namespace Anais {
         }
 
         public void FindAllUnitObjects() {
-            Units.Clear();
-            foreach (IUnitObject obj in FindObjectsOfType<MonoBehaviour>().OfType<IUnitObject>()) {
-                Units.Add(obj);
-            }
+            Units.Set(FindObjectsOfType<MonoBehaviour>().OfType<IUnitObject>());
         }
 
     }
